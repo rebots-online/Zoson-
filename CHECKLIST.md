@@ -131,6 +131,97 @@ This document tracks the progress of ZonosTTS development, providing a time-phas
 - [ ] Build automated deployment system
 - [ ] Develop documentation and tutorial creation tools
 
+## Voice Profile Management System
+
+### Phase 1: Core Functionality (Week 1-2)
+
+#### Profile Management Architecture
+- [/] Design voice profile data format and storage structure
+- [/] Implement VoiceProfileManager class for profile operations
+- [ ] Create directory structure for profiles, samples, and preset voices
+- [ ] Develop audio sample ingestion and embedding extraction
+- [ ] Build tensor serialization and storage mechanisms
+
+#### Preset Voice Integration
+- [ ] Create Kokoro voices collection for quick selection
+- [ ] Implement voice preset loading and management
+- [ ] Develop language-specific voice organization
+- [ ] Build quality metrics for voice preset evaluation
+- [ ] Create voice categorization and tagging system
+
+#### UI Components
+- [ ] Add profile management tab to Gradio interface
+- [ ] Implement voice profile creation workflow
+- [ ] Create parameter adjustment interface for fine-tuning
+- [ ] Develop profile comparison and A/B testing tools
+- [ ] Build sample management and organization interface
+
+### Phase 2: Advanced Features (Week 3-4)
+
+#### Extended Functionality
+- [ ] Implement profile export/import for sharing
+- [ ] Create profile version history and rollback capability
+- [ ] Develop profile merging for voice blending
+- [ ] Build profile similarity search and recommendation
+- [ ] Implement batch operations for profile management
+
+#### Integration with MicroSaaS Platform
+- [ ] Connect profile system with diarization pipeline
+- [ ] Create API endpoints for voice profile management
+- [ ] Develop cloud synchronization for profile library
+- [ ] Build multi-user profile sharing and permissions
+- [ ] Implement profile analytics and usage tracking
+
+## Speech Editor Integration (wscribe-editor)
+
+### Phase 1: Core Integration (Week 1-2)
+
+#### Infrastructure Setup
+- [ ] Fork and adapt wscribe-editor repository for ZonosTTS requirements
+- [ ] Implement phoneme-level timestamping in TTS generation pipeline
+- [ ] Create audio segment identification for minimum viable edit units
+- [ ] Develop SRT/VTT export functionality with phoneme-level metadata
+- [ ] Build clean interface between ZonosTTS output and wscribe-editor input
+
+#### Basic Editor Integration
+- [ ] Create editor launch functionality after TTS generation
+- [ ] Implement audio player synchronization with transcript
+- [ ] Develop text editing interface with phoneme-level accuracy
+- [ ] Build re-synthesis pipeline for edited segments
+- [ ] Create continuous audio stitching for seamless playback
+
+### Phase 2: Advanced Editing Features (Week 3-4)
+
+#### Enhanced Editing Capabilities
+- [ ] Implement prosody preservation for re-synthesized segments
+- [ ] Create phoneme-level visualization for precise editing
+- [ ] Develop pronunciation correction tools
+- [ ] Build emotion and emphasis adjustment interface
+- [ ] Implement speaker voice consistency mechanisms
+
+#### Integration with Voice Profile System
+- [ ] Connect editor with voice profile management
+- [ ] Enable profile switching for specific segments
+- [ ] Create profile parameter adjustment within editor
+- [ ] Implement multi-speaker management in single document
+- [ ] Build profile creation from edited segments
+
+### Phase 3: Production Features (Week 5-6)
+
+#### Export & Workflow Enhancement
+- [ ] Implement batch processing for edited content
+- [ ] Create project saving and resumption functionality
+- [ ] Develop export pipeline for multiple audio formats
+- [ ] Build integration with video synchronization
+- [ ] Create automated quality assessment tools
+
+#### User Experience Refinement
+- [ ] Design intuitive keyboard shortcuts for efficient editing
+- [ ] Implement user preferences and customization
+- [ ] Create comprehensive help documentation
+- [ ] Build tutorial system for new users
+- [ ] Develop progress tracking and edit history
+
 ## Technical Implementation Details
 
 ### Browser-Compatible Diarization Research

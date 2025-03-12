@@ -101,6 +101,24 @@ _For repeated sampling we highly recommend using the gradio interface instead, a
 - **Gradio WebUI**: Zonos comes packaged with an easy to use gradio interface to generate speech
 - **Simple installation and deployment**: Zonos can be installed and deployed simply using the docker file packaged with our repository
 
+### Voice Profile Management System (New)
+
+- **Voice profile storage**: Save and manage voice profiles for future use without re-cloning
+- **Preset voice collection**: Access Kokoro pre-made voices for common use cases across multiple languages
+- **Profile fine-tuning**: Adjust voice parameters to customize and perfect each voice profile
+- **Profile organization**: Tag and categorize voice profiles for easy management
+- **Sample management**: Store and organize reference audio samples with profiles
+- **Import/export capabilities**: Share voice profiles between instances and users
+
+### Speech Editor Integration (Planned)
+
+- **Phoneme-level editing**: Edit generated speech with precise phoneme-level control
+- **Visual transcript editor**: Integrated wscribe-editor for interactive editing and playback
+- **Seamless re-synthesis**: Edit text and regenerate only the modified segments
+- **Prosody preservation**: Maintain natural speech qualities across edits
+- **Format flexibility**: Export as SRT, VTT, JSON with phoneme-level metadata
+- **Multi-speaker support**: Edit documents with multiple speakers and voices
+
 ### MicroSaaS Platform Extension (In Development)
 
 - **Browser-based transcription**: Utilizing Whisper.wasm for client-side speech recognition

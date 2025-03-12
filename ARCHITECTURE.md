@@ -169,12 +169,207 @@ For voiceover workflows without avatar rendering, a CPU-only pipeline offers cos
    - Handling of pauses and natural speech patterns
    - Optional integration with video content
 
+## Voice Profile Management System
+
+### Architecture Overview
+
+The Voice Profile Management System is a comprehensive framework for storing, managing, and utilizing voice profiles in ZonosTTS, providing an alternative to ad-hoc voice cloning with preset voices and fine-tuning capabilities.
+
+```
+┌─ Voice Profile Management System ────────────────────────────────────┐
+│                                                                      │
+│  ┌──────────────────┐   ┌────────────────┐   ┌───────────────────┐  │
+│  │ Profile Creation │──▶│ Profile        │──▶│ Profile Fine-     │  │
+│  │ & Import         │   │ Storage        │   │ Tuning Interface  │  │
+│  └──────────────────┘   └────────────────┘   └───────────────────┘  │
+│           │                      │                     │             │
+│           ▼                      ▼                     ▼             │
+│  ┌──────────────────┐   ┌────────────────┐   ┌───────────────────┐  │
+│  │ Reference Audio  │   │ Voice Library  │   │ Parameter         │  │
+│  │ Management       │   │ (Kokoro etc.)  │   │ Adjustment        │  │
+│  └──────────────────┘   └────────────────┘   └───────────────────┘  │
+│                                │                                     │
+│                                ▼                                     │
+│  ┌──────────────────┐   ┌────────────────┐   ┌───────────────────┐  │
+│  │ Profile Export   │◀──│ TTS System     │◀──│ Quality Metrics   │  │
+│  │ & Sharing        │   │ Integration    │   │ & Analysis        │  │
+│  └──────────────────┘   └────────────────┘   └───────────────────┘  │
+│                                                                      │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+### Core Components
+
+#### 1. VoiceProfileManager
+
+- Central class managing all profile operations
+- Handles profile storage, retrieval, and caching
+- Manages tensor serialization and deserialization
+- Provides interface for profile parameter adjustments
+
+#### 2. Voice Profile Storage Format
+
+JSON-based format for storing voice profiles:
+
+```json
+{
+  "profile_id": "unique-identifier",
+  "name": "Voice Profile Name",
+  "description": "Optional description",
+  "created_at": "2025-03-12T15:01:26-04:00",
+  "updated_at": "2025-03-12T15:01:26-04:00",
+  "source": {
+    "type": "sample",  // "sample", "kokoro", "custom"
+    "path": "path/to/audio.wav"
+  },
+  "speaker_embedding": {
+    "format": "tensor",
+    "data": "base64-encoded-tensor-data"
+  },
+  "parameters": {
+    "fmax": 24000,
+    "pitch_std": 45.0,
+    "speaking_rate": 15.0,
+    "dnsmos_ovrl": 4.0,
+    "emotions": [1.0, 0.05, 0.05, 0.05, 0.05, 0.05, 0.1, 0.2],
+    "vqscore": 0.78
+  },
+  "tags": ["professional", "female", "english"],
+  "samples": ["path/to/sample1.wav", "path/to/sample2.wav"]
+}
+```
+
+#### 3. Directory Structure
+
+```
+zonos/
+├── voices/
+│   ├── profiles/        # JSON profile definitions
+│   │   ├── profile1.json
+│   │   └── profile2.json
+│   ├── samples/         # Sample audio organized by profile
+│   │   ├── profile1/
+│   │   │   └── samples...
+│   │   └── profile2/
+│   │       └── samples...
+│   └── kokoro/          # Preset voice samples
+│       ├── female1_en.wav
+│       ├── male1_en.wav
+│       └── ...
+└── ...
+```
+
+#### 4. Gradio Integration
+
+- Profile management tab in UI
+- Voice selection dropdown for Kokoro voices
+- Parameter adjustment sliders
+- Profile creation, editing, and deletion functions
+- Sample management interface
+
 ### Technical Integration Strategy
 
 - **Browser-First Approach**: Maximize client-side processing for scalability
 - **Modular Components**: Allow selective server offloading when necessary
 - **Progressive Enhancement**: Provide basic functionality with graceful enhancement
 - **Asynchronous Processing**: Enable background processing for longer content
+
+## Speech Editor Integration (wscribe-editor)
+
+### Architecture Overview
+
+The integration of wscribe-editor with ZonosTTS creates a complete end-to-end TTS system with powerful editing capabilities. This allows users to generate audio with ZonosTTS and then immediately edit and fine-tune the output at the phoneme level while preserving natural prosody.
+
+```
+┌─ ZonosTTS Speech Editor Workflow ────────────────────────────────────┐
+│                                                                       │
+│  ┌──────────────┐   ┌───────────────┐   ┌────────────────────────┐   │
+│  │ Text Input   │──▶│ TTS           │──▶│ Phoneme-Level          │   │
+│  │ & Parameters │   │ Generation    │   │ Timestamping           │   │
+│  └──────────────┘   └───────────────┘   └────────────────────────┘   │
+│         ▲                                          │                  │
+│         │                                          ▼                  │
+│  ┌──────────────┐   ┌───────────────┐   ┌────────────────────────┐   │
+│  │ Voice        │◀──│ Segment       │◀──│ SRT/VTT/JSON          │   │
+│  │ Profiles     │   │ Re-synthesis  │   │ Generation             │   │
+│  └──────────────┘   └───────────────┘   └────────────────────────┘   │
+│         ▲                   ▲                      │                  │
+│         └───────────────────┘                      ▼                  │
+│                                       ┌────────────────────────┐   │
+│                                       │ wscribe-editor         │   │
+│  ┌──────────────┐                    │ ┌──────────────────┐   │   │
+│  │ Final Audio  │◀───────────────────┤ │ Phoneme Editor   │   │   │
+│  │ Export       │                    │ └──────────────────┘   │   │
+│  └──────────────┘                    └────────────────────────┘   │
+│                                                                       │
+└───────────────────────────────────────────────────────────────────────┘
+```
+
+### Core Components
+
+#### 1. Phoneme-Level Timestamp Generation
+
+The TTS system will be enhanced to generate not just audio but also precise phoneme-level timestamps that map each sound to its corresponding text position. This requires:
+
+- Phoneme extraction from the text normalization pipeline
+- Alignment tracking during the audio generation process
+- Metadata packaging into standard formats (SRT, VTT, JSON)
+
+#### 2. Segment Identification and Processing
+
+The system identifies natural breakpoints for editing, which may include:
+
+- Sentence boundaries for major edits
+- Phrase and clause boundaries for medium-scale edits
+- Word and phoneme boundaries for fine-grained adjustments
+
+This segmentation allows for targeted re-synthesis of only the modified portions while preserving the natural flow of speech.
+
+#### 3. wscribe-editor Adaptation
+
+The wscribe-editor will be adapted and enhanced to support:
+
+- Direct integration with ZonosTTS's output formats
+- Visualization of phoneme-level timing and confidence
+- Interactive editing interface with real-time feedback
+- Support for prosody markers and speech emphasis
+- Multi-speaker document management
+
+#### 4. Re-synthesis Pipeline
+
+When edits are made, the system will:
+
+1. Identify the minimal scope of text that needs re-synthesis
+2. Maintain prosodic context from surrounding speech
+3. Apply the same voice profile and parameters as the original
+4. Regenerate only the modified segments
+5. Seamlessly stitch the new audio with unchanged portions
+
+#### 5. Integration with Voice Profile Management
+
+The editor will connect directly to the Voice Profile Management System, allowing:
+
+- Voice profile selection for specific segments
+- Parameter adjustment within the editor interface
+- Creation of new profiles from particularly well-rendered segments
+- A/B testing of different voice settings
+
+### Technical Implementation Strategy
+
+- **Web-Based Approach**: Fully browser-compatible solution
+- **Modular Architecture**: Clean interface boundaries between components
+- **Minimal Re-synthesis**: Only regenerate what has changed
+- **Context Preservation**: Maintain prosody across edit boundaries
+- **Progressive Enhancement**: Basic functionality with advanced options
+
+### Data Flow
+
+1. **Input Phase**: Text and voice parameters → ZonosTTS
+2. **Generation Phase**: Text → Phonemes → Audio with timestamps
+3. **Export Phase**: Audio + Metadata → SRT/VTT/JSON
+4. **Editing Phase**: wscribe-editor interface for adjustments
+5. **Re-synthesis Phase**: Modified text → Targeted audio regeneration
+6. **Output Phase**: Stitched audio and updated metadata files
 
 ## Future Architecture Considerations
 
