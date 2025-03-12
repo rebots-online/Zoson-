@@ -371,6 +371,123 @@ The editor will connect directly to the Voice Profile Management System, allowin
 5. **Re-synthesis Phase**: Modified text → Targeted audio regeneration
 6. **Output Phase**: Stitched audio and updated metadata files
 
+## Avatar Lip-Sync Integration (Remotion Studio + Hallo)
+
+### Architecture Overview
+
+The Avatar Lip-Sync integration extends ZonosTTS beyond audio generation to create a complete multimedia production system. By combining the speech generation capabilities with visual avatar animation, users can create fully synchronized talking head videos with precise lip movements corresponding to the generated speech.
+
+```
+┌─ ZonosTTS Avatar Integration Architecture ────────────────────────────────────┐
+│                                                                                │
+│  ┌──────────────┐   ┌───────────────┐                   ┌────────────────┐    │
+│  │ Text Input   │──▶│ TTS           │───────────────────┤ wscribe-editor │    │
+│  │ & Parameters │   │ Generation    │      ┌────────┐   │                │    │
+│  └──────────────┘   └───────────────┘      │        │   └────────────────┘    │
+│         │                   │              │        │            │             │
+│         │                   ▼              │        │            │             │
+│         │            ┌───────────────┐     │        │     ┌─────────────┐     │
+│         │            │ Phoneme-Level │     │        │     │ Edit Audio  │     │
+│         │            │ Timestamping  │─────┘        │     │ & Metadata  │     │
+│         │            └───────────────┘              │     └─────────────┘     │
+│         │                   │                       │            │             │
+│         ▼                   ▼                       ▼            ▼             │
+│  ┌──────────────┐   ┌───────────────┐     ┌────────────────────────────┐     │
+│  │ Avatar       │──▶│ Hallo Lip-Sync│────▶│ Phoneme-to-Viseme Mapping  │     │
+│  │ Selection    │   │ System        │     │ & Animation Generation     │     │
+│  └──────────────┘   └───────────────┘     └────────────────────────────┘     │
+│                                                          │                    │
+│                                                          ▼                    │
+│  ┌──────────────┐                            ┌────────────────────────┐       │
+│  │ Backgrounds, │◀──────────────────────────┤ Remotion Studio        │       │
+│  │ VFX, Text    │                            │ Animation Editor       │       │
+│  └──────────────┘                            └────────────────────────┘       │
+│         │                                               │                     │
+│         └───────────────────────────────────────────────┘                     │
+│                                │                                              │
+│                                ▼                                              │
+│                      ┌────────────────────┐                                   │
+│                      │ Final Video Export │                                   │
+│                      └────────────────────┘                                   │
+│                                                                                │
+└────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Core Components
+
+#### 1. Avatar Profile Management System
+
+A dedicated subsystem for handling avatar assets and configurations:
+
+- Avatar image storage and retrieval
+- Profile metadata for consistent use
+- Association with voice profiles
+- Customization parameters for expressions and styling
+- Gallery and preview capabilities
+
+#### 2. Hallo Lip-Sync Integration
+
+The open-source Hallo lip-sync system provides high-quality avatar animation:
+
+- API integration with ZonosTTS output
+- Phoneme-to-viseme mapping for precise mouth movements
+- Frame generation with temporal consistency
+- Expression and emotion control parameters
+- Containerized deployment for consistent processing
+
+#### 3. Remotion Studio Integration
+
+The React-based video editing framework enables professional compositions:
+
+- Timeline-based editing with phoneme visualization
+- Scene composition with layered elements
+- Visual effects and transitions library
+- Text and graphic overlay capabilities
+- Multi-format export options
+
+### Technical Implementation Strategy
+
+#### Data Flow Pipeline
+
+1. **Text-to-Speech Generation**:
+   - Input text is processed through ZonosTTS to generate audio
+   - Phoneme extraction and timestamp generation occurs during synthesis
+   - Audio and phoneme data are prepared for downstream processing
+
+2. **Lip-Sync Animation**:
+   - Selected avatar image and audio are sent to Hallo system
+   - Phoneme timing is mapped to appropriate viseme formations
+   - Animation frames are generated with consistent timing
+   - Metadata is preserved for editing purposes
+
+3. **Video Composition**:
+   - Animation frames are imported into Remotion Studio
+   - Audio is synchronized with visual elements
+   - Additional elements (backgrounds, effects, text) are added
+   - Timeline editing allows precise control of all elements
+
+4. **Final Export**:
+   - Composed video is rendered in selected format and resolution
+   - Project files are saved for future editing
+   - Assets are archived for reuse in future projects
+
+#### Integration Architecture
+
+- **Modular Design**: Clean separation between components
+- **API-Based Communication**: Well-defined interfaces between systems
+- **Container-Based Deployment**: Consistent environments for processing
+- **Parallel Processing**: Efficient handling of compute-intensive tasks
+- **Progressive Enhancement**: Basic functionality with advanced options
+
+### User Experience Flow
+
+1. **Input Phase**: Text entry and voice/avatar selection
+2. **Generation Phase**: Audio synthesis with phoneme timing
+3. **Optional Editing**: Audio refinement with wscribe-editor
+4. **Animation Phase**: Lip-sync generation with Hallo
+5. **Composition Phase**: Video editing with Remotion Studio
+6. **Output Phase**: Final video export in desired format
+
 ## Future Architecture Considerations
 
 - Potential optimization for CPU-only environments
