@@ -1,6 +1,7 @@
 import torch
 import torchaudio
 import gradio as gr
+import os
 from os import getenv
 
 from zonos.model import Zonos, DEFAULT_BACKBONE_CLS as ZonosBackbone
@@ -12,6 +13,20 @@ CURRENT_MODEL = None
 
 SPEAKER_EMBEDDING = None
 SPEAKER_AUDIO_PATH = None
+
+# Kokoro voice options
+KOKORO_VOICES = {
+    "None (Use Voice Cloning)": None,
+    "Kokoro - Female 1 (English)": "assets/kokoro_samples/female1_en.wav",
+    "Kokoro - Female 2 (English)": "assets/kokoro_samples/female2_en.wav",
+    "Kokoro - Male 1 (English)": "assets/kokoro_samples/male1_en.wav",
+    "Kokoro - Male 2 (English)": "assets/kokoro_samples/male2_en.wav",
+    "Kokoro - Female 1 (Japanese)": "assets/kokoro_samples/female1_jp.wav",
+    "Kokoro - Male 1 (Japanese)": "assets/kokoro_samples/male1_jp.wav",
+    "Kokoro - Female 1 (Chinese)": "assets/kokoro_samples/female1_zh.wav",
+    "Kokoro - Female 1 (French)": "assets/kokoro_samples/female1_fr.wav",
+    "Kokoro - Female 1 (German)": "assets/kokoro_samples/female1_de.wav",
+}
 
 
 def load_model_if_needed(model_choice: str):
@@ -86,6 +101,7 @@ def generate_audio(
     model_choice,
     text,
     language,
+    kokoro_voice_choice,
     speaker_audio,
     prefix_audio,
     e1,
@@ -414,6 +430,60 @@ def build_interface():
 
 
 if __name__ == "__main__":
+    import argparse
+    import socket
+    from contextlib import closing
+    
+    def find_free_port(start_port, max_attempts=100):
+        """Find a free port starting from start_port."""
+        for port in range(start_port, start_port + max_attempts):
+            with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
+                try:
+                    sock.bind(('0.0.0.0', port))
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                    return port
+                except OSError:
+                    continue
+        return None
+    
+    parser = argparse.ArgumentParser(description="ZonosTTS Gradio Interface")
+    parser.add_argument("--share", action="store_true", help="Create a shareable link with HTTPS (enables microphone access)")
+    parser.add_argument("--port", type=int, default=7860, help="Port to run the server on")
+    parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to run the server on")
+    parser.add_argument("--auto-port", action="store_true", help="Automatically find an available port if the specified one is busy")
+    args = parser.parse_args()
+    
+    # Check environment variable if --share wasn't explicitly provided
+    env_share = getenv("GRADIO_SHARE", "False").lower() in ("true", "1", "t")
+    env_auto_port = getenv("GRADIO_AUTO_PORT", "False").lower() in ("true", "1", "t")
+    share = args.share or env_share
+    auto_port = args.auto_port or env_auto_port
+    
+    # If auto-port is enabled, try to find an available port
+    port = args.port
+    if auto_port:
+        free_port = find_free_port(args.port)
+        if free_port is not None:
+            port = free_port
+        else:
+            print(f"Warning: Could not find an available port in range {args.port}-{args.port+100}")
+    
     demo = build_interface()
-    share = getenv("GRADIO_SHARE", "False").lower() in ("true", "1", "t")
-    demo.launch(server_name="0.0.0.0", server_port=7860, share=share)
+    print(f"\n{'*' * 70}")
+    print(f"* Launching server with settings:")
+    print(f"* - Host: {args.host}")
+    print(f"* - Port: {port} {'(auto-selected)' if port != args.port else ''}")
+    print(f"* - Share: {share} {'(HTTPS link will be created for microphone access)' if share else ''}")
+    print(f"{'*' * 70}\n")
+    
+    try:
+        demo.launch(server_name=args.host, server_port=port, share=share)
+    except OSError as e:
+        if "Cannot find empty port" in str(e):
+            print("\nERROR: All ports in the specified range are busy.")
+            print("Try terminating existing Gradio instances with:")
+            print("  pkill -f gradio")
+            print("Or run with auto port selection:")
+            print("  GRADIO_AUTO_PORT=True uv run gradio_interface.py --share\n")
+        else:
+            raise

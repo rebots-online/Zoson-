@@ -1,4 +1,4 @@
-# Zonos-v0.1
+# Zonos-v0.1 - Advanced Voice Cloning & Synthesis Platform
 
 <div align="center">
 <img src="assets/ZonosHeader.png" 
@@ -24,6 +24,10 @@ Our model enables highly natural speech generation from text prompts when given 
 
 ##### We also have a hosted version available at [playground.zyphra.com/audio](https://playground.zyphra.com/audio)
 
+## MicroSaaS Voice Cloning & Redubbing Platform
+
+ZonosTTS is being extended into a complete microSaaS platform for voice cloning and redubbing. This architecture combines our powerful TTS capabilities with browser-compatible speech recognition and diarization, enabling users to easily clone voices and create redubbed content with minimal hardware requirements.
+
 ---
 
 Zonos follows a straightforward architecture: text normalization and phonemization via eSpeak, followed by DAC token prediction through a transformer or hybrid backbone. An overview of the architecture can be seen below.
@@ -37,6 +41,16 @@ Zonos follows a straightforward architecture: text normalization and phonemizati
 </div>
 
 ---
+
+## Documentation
+
+For detailed information about ZonosTTS and the microSaaS platform, please refer to the following documentation:
+
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Detailed system architecture and design
+- [CONDITIONING_README.md](./CONDITIONING_README.md) - Conditioning parameters and their effects
+- [ROADMAP.md](./ROADMAP.md) - Development trajectory and future plans
+- [CHECKLIST.md](./CHECKLIST.md) - Implementation progress and task tracking
+- [BROWSER_DIARIZATION.md](./BROWSER_DIARIZATION.md) - Analysis of browser-compatible speaker diarization approaches
 
 ## Usage
 
@@ -77,13 +91,24 @@ _For repeated sampling we highly recommend using the gradio interface instead, a
 
 ## Features
 
-- Zero-shot TTS with voice cloning: Input desired text and a 10-30s speaker sample to generate high quality TTS output
-- Audio prefix inputs: Add text plus an audio prefix for even richer speaker matching. Audio prefixes can be used to elicit behaviours such as whispering which can otherwise be challenging to replicate when cloning from speaker embeddings
-- Multilingual support: Zonos-v0.1 supports English, Japanese, Chinese, French, and German
-- Audio quality and emotion control: Zonos offers fine-grained control of many aspects of the generated audio. These include speaking rate, pitch, maximum frequency, audio quality, and various emotions such as happiness, anger, sadness, and fear.
-- Fast: our model runs with a real-time factor of ~2x on an RTX 4090 (i.e. generates 2 seconds of audio per 1 second of compute time)
-- Gradio WebUI: Zonos comes packaged with an easy to use gradio interface to generate speech
-- Simple installation and deployment: Zonos can be installed and deployed simply using the docker file packaged with our repository.
+### Core TTS Capabilities
+
+- **Zero-shot TTS with voice cloning**: Input desired text and a 10-30s speaker sample to generate high quality TTS output
+- **Audio prefix inputs**: Add text plus an audio prefix for even richer speaker matching. Audio prefixes can be used to elicit behaviours such as whispering which can otherwise be challenging to replicate when cloning from speaker embeddings
+- **Multilingual support**: Zonos-v0.1 supports English, Japanese, Chinese, French, and German
+- **Audio quality and emotion control**: Zonos offers fine-grained control of many aspects of the generated audio. These include speaking rate, pitch, maximum frequency, audio quality, and various emotions such as happiness, anger, sadness, and fear
+- **Fast**: our model runs with a real-time factor of ~2x on an RTX 4090 (i.e. generates 2 seconds of audio per 1 second of compute time)
+- **Gradio WebUI**: Zonos comes packaged with an easy to use gradio interface to generate speech
+- **Simple installation and deployment**: Zonos can be installed and deployed simply using the docker file packaged with our repository
+
+### MicroSaaS Platform Extension (In Development)
+
+- **Browser-based transcription**: Utilizing Whisper.wasm for client-side speech recognition
+- **Speaker diarization**: Identifying and segmenting different speakers in audio content
+- **Voice cloning workflow**: Complete pipeline from audio input to cloned voice output
+- **CPU-optimized processing**: Designed to run efficiently without GPU requirements
+- **Redubbing capabilities**: Tools for replacing voice content while preserving timing and emotion
+- **Progressive enhancement**: Basic functionality in-browser with optional server-side enhancements
 
 ## Installation
 

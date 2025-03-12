@@ -90,12 +90,100 @@ zonos/
 - **Memory Requirements**: Minimum 6GB VRAM (GPU) or equivalent RAM (CPU)
 - **Dependencies**: eSpeak-ng, PyTorch, torchaudio
 
+## MicroSaaS Extension Architecture
+
+The ZonosTTS framework can be extended into a complete voice cloning and redubbing microSaaS platform through the addition of several key components.
+
+### Extended System Architecture
+
+```
+┌─ Phase 1: MVP ─────────────────────────────────────────────────────┐
+│                                                                     │
+│  • Whisper.wasm for transcription                                   │
+│  • Basic speaker segmentation (non-overlapping)                     │
+│  • ZonosTTS for voice cloning and synthesis                         │
+│  • Simple audio export                                              │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌─ Phase 2: Enhanced ───────────────────────────────────────────────┐
+│                                                                     │
+│  • Add server-side Pyannote for better diarization                  │
+│  • Implement basic overlap handling                                 │
+│  • Add translation capabilities                                     │
+│  • Improve synchronization                                          │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌─ Phase 3: Advanced ───────────────────────────────────────────────┐
+│                                                                     │
+│  • Full speaker overlap detection and handling                      │
+│  • Emotion transfer from original to synthesized speech             │
+│  • Advanced audio editing capabilities                              │
+│  • API access for third-party integration                           │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### CPU-Focused Architecture
+
+For voiceover workflows without avatar rendering, a CPU-only pipeline offers cost-effective processing:
+
+```
+┌─ Client (CPU-Only) ─────────────────────────────────────────────────────┐
+│                                                                          │
+│  ┌──────────────┐   ┌───────────────┐   ┌────────────────┐              │
+│  │ Audio/Video  │──▶│ Whisper.wasm  │──▶│ Transcript     │              │
+│  │ Input        │   │ Transcription │   │ Processing     │              │
+│  └──────────────┘   └───────────────┘   └────────────────┘              │
+│                                                 │                        │
+│  ┌──────────────┐   ┌───────────────┐   ┌──────▼─────────┐              │
+│  │ Final Audio  │◀──│ ZonosTTS      │◀──│ Voice Profile  │              │
+│  │ Output       │   │ (CPU version) │   │ Management     │              │
+│  └──────────────┘   └───────────────┘   └────────────────┘              │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### Modular Pipeline Components
+
+1. **Transcription Module**
+   - Whisper.wasm for browser-based speech recognition
+   - Timestamp generation for synchronization
+   - Language detection and handling
+   
+2. **Diarization Module**
+   - Speaker identification and segmentation
+   - Voice profile extraction
+   - Sequential processing after transcription
+   
+3. **Voice Synthesis Module**
+   - ZonosTTS for voice cloning
+   - Emotion and cadence matching
+   - Language-specific synthesis optimization
+   
+4. **Synchronization Module**
+   - Alignment of synthesized speech with original timing
+   - Handling of pauses and natural speech patterns
+   - Optional integration with video content
+
+### Technical Integration Strategy
+
+- **Browser-First Approach**: Maximize client-side processing for scalability
+- **Modular Components**: Allow selective server offloading when necessary
+- **Progressive Enhancement**: Provide basic functionality with graceful enhancement
+- **Asynchronous Processing**: Enable background processing for longer content
+
 ## Future Architecture Considerations
 
 - Potential optimization for CPU-only environments
 - Further model size reduction techniques
 - Enhanced multilingual support
 - Real-time streaming capability
+- Integration with translation services
+- Support for emotion transfer and preservation
 
 ---
 
